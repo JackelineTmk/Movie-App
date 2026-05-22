@@ -24,7 +24,7 @@ Thanks to Docker Compose, the application can be launched with a single command,
 
 ### ⚠️ Important Note on Permissions
 Depending on your Operating System, you might need **administrator privileges** (root access) to run Docker commands:
-- **Linux (e.g., Ubuntu):** You usually need to prefix the command with `sudo` and enter your password (e.g., `sudo docker-compose up --build`).
+- **Linux (e.g., Ubuntu):** For most Linux distros you can simply prefix the command with `sudo` (e.g., `sudo docker-compose up --build`).
 
 
 ### Step-by-Step
