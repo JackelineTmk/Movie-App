@@ -62,7 +62,6 @@ export function MovieDetails() {
     try {
       await updateRating(Number(id), selectedRating);
       setUserRating(selectedRating);
-      alert('Rating updated!');
     } catch (err) {
       alert('Error updating rating.');
     }
@@ -74,7 +73,6 @@ export function MovieDetails() {
       await deleteRating(Number(id));
       setUserRating(null);
       setSelectedRating(5); // Reseta o padrão
-      alert('Rating removed.');
     } catch (err) {
       alert('Error removing rating.');
     }
