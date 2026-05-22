@@ -22,6 +22,11 @@ Thanks to Docker Compose, the application can be launched with a single command,
 - Docker and Docker Compose installed.
 - A valid TMDB API Key.
 
+### ⚠️ Important Note on Permissions
+Depending on your Operating System, you might need **administrator privileges** (root access) to run Docker commands:
+- **Linux (e.g., Ubuntu):** You usually need to prefix the command with `sudo` and enter your password (e.g., `sudo docker-compose up --build`).
+
+
 ### Step-by-Step
 
 1. Inside the `frontend/` folder, create a `.env.local` file and add your TMDB token:
