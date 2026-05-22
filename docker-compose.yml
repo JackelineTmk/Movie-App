@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  backend:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app # Mantém o banco salvo no pc mesmo desligando o Docker
+    
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    env_file:
+      - ./frontend/.env.local # Passa a chave do TMDB para o container
+    depends_on:
+      - backend
