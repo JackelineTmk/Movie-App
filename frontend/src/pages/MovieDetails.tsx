@@ -103,7 +103,7 @@ export function MovieDetails() {
           <p><strong>Release date:</strong> {movie.release_date}</p>
           
           <h3>Synopsis</h3>
-          <p>{movie.overview || 'No synopsis is available in Portuguese.'}</p>
+          <p>{movie.overview || 'No synopsis is available.'}</p>
 
           {/* Seção de Avaliação */}
           <div style={{ backgroundColor: '#2a2a2a', padding: '15px', borderRadius: '8px', marginTop: '20px' }}>
