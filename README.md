@@ -12,6 +12,8 @@ This project consists of a movie search and rating application powered by the TM
 - Movie search using the TMDB public API.
 - Detailed movie information.
 - Local rating system (1 to 5 stars) with SQLite.
+- Year filter.
+- Infinite scroll.
 - Full application Dockerization.
 
 ## 🚀 How to Run (Single Command)
