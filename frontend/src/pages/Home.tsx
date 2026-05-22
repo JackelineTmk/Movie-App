@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { searchMovies, type Movie } from '../services/tmdb';
 
@@ -7,31 +7,70 @@ export function Home() {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  
-  // NOVO: Estado para o filtro de ano
   const [yearFilter, setYearFilter] = useState('');
+  
+  // ESTADOS PARA SCROLL INFINITO
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
 
+  // Função de busca principal (Reseta a lista para nova busca)
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!query.trim()) return;
 
     setIsLoading(true);
     setError('');
+    setPage(1); // Reseta para a página 1
+
     try {
-      const results = await searchMovies(query);
+      const results = await searchMovies(query, 1);
       setMovies(results);
-      // Resetar o filtro ao fazer uma nova busca
-      setYearFilter(''); 
+      setHasMore(results.length > 0);
     } catch (err) {
-      setError('Erro ao buscar filmes.');
+      setError('Error searching movies.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Lógica de filtragem: 
-  // Se 'yearFilter' estiver vazio, mostra todos. 
-  // Se tiver algo, filtra os filmes que começam com aquele ano.
+  // Função para carregar mais filmes
+  const loadMoreMovies = useCallback(async () => {
+    if (isLoading || !hasMore) return;
+
+    setIsLoading(true);
+    const nextPage = page + 1;
+
+    try {
+      const newResults = await searchMovies(query, nextPage);
+      if (newResults.length === 0) {
+        setHasMore(false);
+      } else {
+        setMovies(prev => [...prev, ...newResults]); // Anexa os novos filmes
+        setPage(nextPage);
+      }
+    } catch (err) {
+      console.error("Error loading more movies.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [isLoading, hasMore, page, query]);
+
+  // Monitor de Scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      // Verifica se o usuário chegou a 100px do fim da página
+      if (
+        window.innerHeight + document.documentElement.scrollTop + 100 
+        >= document.documentElement.offsetHeight
+      ) {
+        loadMoreMovies();
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [loadMoreMovies]);
+
   const filteredMovies = movies.filter((movie) => {
     if (!yearFilter) return true;
     return movie.release_date?.startsWith(yearFilter);
@@ -39,73 +78,52 @@ export function Home() {
 
   return (
     <div>
-      <h2>Buscar Filmes</h2>
+      <h2>Explore Movies</h2>
       
       <form onSubmit={handleSearch} style={{ display: 'flex', gap: '8px', marginBottom: '20px' }}>
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Digite o nome do filme..."
-          style={{ padding: '8px', flex: 1, borderRadius: '4px', border: '1px solid #ccc' }}
+          placeholder="Search for a movie..."
+          style={{ padding: '10px', flex: 1, borderRadius: '4px', border: '1px solid #444', backgroundColor: '#1a1a1a', color: 'white' }}
         />
-        <button type="submit" disabled={isLoading} style={{ padding: '8px 16px' }}>
-          {isLoading ? 'Buscando...' : 'Buscar'}
+        <button type="submit" disabled={isLoading} style={{ padding: '10px 20px', cursor: 'pointer' }}>
+          Search
         </button>
       </form>
 
-      {/* NOVO: Interface do Filtro */}
+      {/* Filtro por ano */}
       {movies.length > 0 && (
         <div style={{ marginBottom: '20px', padding: '10px', backgroundColor: '#2a2a2a', borderRadius: '8px' }}>
-          <label htmlFor="year-filter" style={{ marginRight: '10px' }}>Filtrar por ano:</label>
+          <label>Filter by year: </label>
           <input
-            id="year-filter"
             type="number"
-            placeholder="Ex: 2024"
             value={yearFilter}
             onChange={(e) => setYearFilter(e.target.value)}
-            style={{ padding: '5px', borderRadius: '4px', border: '1px solid #444', width: '80px' }}
+            style={{ padding: '5px', width: '80px', marginLeft: '10px' }}
           />
-          {yearFilter && (
-            <button 
-              onClick={() => setYearFilter('')} 
-              style={{ marginLeft: '10px', fontSize: '12px', cursor: 'pointer' }}
-            >
-              Limpar Filtro
-            </button>
-          )}
-          <span style={{ marginLeft: '15px', color: '#aaa', fontSize: '14px' }}>
-            Resultados encontrados: {filteredMovies.length}
-          </span>
         </div>
       )}
 
-      {error && <p style={{ color: '#ff4a4a' }}>{error}</p>}
-
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '20px' }}>
-        {/* IMPORTANTE: Usamos o 'filteredMovies' em vez de 'movies' para renderizar */}
-        {filteredMovies.map((movie) => (
-          <Link to={`/movie/${movie.id}`} key={movie.id} style={{ textDecoration: 'none', color: 'inherit' }}>
-            <div style={{ border: '1px solid #444', padding: '10px', borderRadius: '8px', textAlign: 'center', height: '100%' }}>
+        {filteredMovies.map((movie, index) => (
+          <Link to={`/movie/${movie.id}`} key={`${movie.id}-${index}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+            <div style={{ border: '1px solid #444', padding: '10px', borderRadius: '8px', textAlign: 'center', backgroundColor: '#111' }}>
               {movie.poster_path ? (
-                <img 
-                  src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`} 
-                  alt={movie.title} 
-                  style={{ width: '100%', borderRadius: '4px' }}
-                />
+                <img src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`} alt={movie.title} style={{ width: '100%', borderRadius: '4px' }} />
               ) : (
-                <div style={{ height: '270px', backgroundColor: '#333', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Sem Pôster</div>
+                <div style={{ height: '270px', backgroundColor: '#333', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>No Poster</div>
               )}
-              <h4 style={{ margin: '10px 0 0 0', fontSize: '16px' }}>{movie.title}</h4>
-              <p style={{ fontSize: '12px', color: '#aaa' }}>{movie.release_date?.split('-')[0] || 'N/A'}</p>
+              <h4 style={{ margin: '10px 0 5px 0' }}>{movie.title}</h4>
+              <p style={{ color: '#aaa', fontSize: '12px' }}>{movie.release_date?.split('-')[0]}</p>
             </div>
           </Link>
         ))}
       </div>
 
-      {movies.length > 0 && filteredMovies.length === 0 && (
-        <p style={{ textAlign: 'center', marginTop: '20px' }}>Nenhum filme encontrado para o ano {yearFilter}.</p>
-      )}
+      {isLoading && <p style={{ textAlign: 'center', margin: '20px' }}>Loading more movies...</p>}
+      {!hasMore && movies.length > 0 && <p style={{ textAlign: 'center', margin: '20px', color: '#888' }}>You've reached the end!</p>}
     </div>
   );
 }

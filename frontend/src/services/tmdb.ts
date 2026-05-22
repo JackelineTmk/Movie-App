@@ -4,7 +4,6 @@ const tmdbApi = axios.create({
   baseURL: 'https://api.themoviedb.org/3',
   headers: {
     accept: 'application/json',
-    // Pega o token do nosso arquivo .env.local
     Authorization: `Bearer ${import.meta.env.VITE_TMDB_TOKEN}`
   }
 });
@@ -22,22 +21,19 @@ interface SearchResponse {
 }
 
 // Função que faz a busca dos filmes
-export const searchMovies = async (query: string): Promise<Movie[]> => {
-  if (!query) return [];
-  
+export const searchMovies = async (query: string, page: number = 1): Promise<Movie[]> => {
   try {
-    const response = await tmdbApi.get<SearchResponse>('/search/movie', {
+    const response = await tmdbApi.get('/search/movie', {
       params: {
-        query: query,
-        language: 'pt-BR', // Traz os dados em português
+        query,
         include_adult: false,
+        page: page 
       }
     });
-    
     return response.data.results;
   } catch (error) {
-    console.error("Erro ao buscar filmes:", error);
-    throw error; // Repassa o erro para o componente tratar (mostrar loading/erro)
+    console.error("Error searching for movies:", error);
+    throw error;
   }
 };
 
@@ -57,13 +53,12 @@ export const getMovieDetails = async (id: string | number): Promise<MovieDetails
   try {
     const response = await tmdbApi.get<MovieDetails>(`/movie/${id}`, {
       params: {
-        language: 'pt-BR',
-        append_to_response: 'credits' // Isso traz o elenco junto na mesma requisição!
+        append_to_response: 'credits'
       }
     });
     return response.data;
   } catch (error) {
-    console.error("Erro ao buscar detalhes do filme:", error);
+    console.error("Error searching for details:", error);
     throw error;
   }
 };

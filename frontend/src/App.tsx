@@ -9,8 +9,8 @@ function App() {
       {/* Barra de Navegação Simples */}
       <header style={{ padding: '1rem', backgroundColor: '#242424', color: 'white' }}>
         <nav style={{ display: 'flex', gap: '1rem' }}>
-          <Link to="/" style={{ color: '#646cff', textDecoration: 'none' }}>Página Principal</Link>
-          <Link to="/avaliados" style={{ color: '#646cff', textDecoration: 'none' }}>Filmes Avaliados</Link>
+          <Link to="/" style={{ color: '#646cff', textDecoration: 'none' }}>Home Page</Link>
+          <Link to="/avaliados" style={{ color: '#646cff', textDecoration: 'none' }}>Rated Movies</Link>
         </nav>
       </header>
 

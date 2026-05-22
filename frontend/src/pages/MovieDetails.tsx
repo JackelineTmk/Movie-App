@@ -32,7 +32,7 @@ export function MovieDetails() {
           setSelectedRating(currentRating.rating); // Salva a nota
         }
       } catch (err) {
-        setError('Erro ao carregar as informações do filme.');
+        setError('Error loading the informations.');
       } finally {
         setIsLoading(false);
       }
@@ -53,7 +53,7 @@ export function MovieDetails() {
       });
       setUserRating(selectedRating);
     } catch (err) {
-      alert('Erro ao salvar avaliação.');
+      alert('Error saving the ratings.');
     }
   };
 
@@ -62,9 +62,9 @@ export function MovieDetails() {
     try {
       await updateRating(Number(id), selectedRating);
       setUserRating(selectedRating);
-      alert('Avaliação atualizada!');
+      alert('Rating updated!');
     } catch (err) {
-      alert('Erro ao atualizar avaliação.');
+      alert('Error updating rating.');
     }
   };
 
@@ -74,19 +74,19 @@ export function MovieDetails() {
       await deleteRating(Number(id));
       setUserRating(null);
       setSelectedRating(5); // Reseta o padrão
-      alert('Avaliação removida.');
+      alert('Rating removed.');
     } catch (err) {
-      alert('Erro ao remover avaliação.');
+      alert('Error removing rating.');
     }
   };
 
-  if (isLoading) return <p>Carregando detalhes...</p>;
-  if (error || !movie) return <p style={{ color: 'red' }}>{error || 'Filme não encontrado.'}</p>;
+  if (isLoading) return <p>Loading...</p>;
+  if (error || !movie) return <p style={{ color: 'red' }}>{error || 'Movie not found.'}</p>;
 
   return (
     <div style={{ maxWidth: '800px', margin: '0 auto' }}>
       <button onClick={() => navigate(-1)} style={{ marginBottom: '20px', cursor: 'pointer' }}>
-        ← Voltar
+        ← Back
       </button>
 
       <div style={{ display: 'flex', gap: '30px', flexWrap: 'wrap' }}>
@@ -102,18 +102,18 @@ export function MovieDetails() {
         {/* Informações */}
         <div style={{ flex: 1, minWidth: '300px' }}>
           <h2>{movie.title}</h2>
-          <p><strong>Data de Lançamento:</strong> {movie.release_date}</p>
+          <p><strong>Release date:</strong> {movie.release_date}</p>
           
-          <h3>Sinopse</h3>
-          <p>{movie.overview || 'Nenhuma sinopse disponível em português.'}</p>
+          <h3>Synopsis</h3>
+          <p>{movie.overview || 'No synopsis is available in Portuguese.'}</p>
 
           {/* Seção de Avaliação */}
           <div style={{ backgroundColor: '#2a2a2a', padding: '15px', borderRadius: '8px', marginTop: '20px' }}>
-            <h3>Sua Avaliação</h3>
+            <h3>Your rating</h3>
             
             {userRating !== null ? (
               <div>
-                <p>Você avaliou este filme com nota: <strong>{userRating} / 5</strong></p>
+                <p>You rated this movie: <strong>{userRating} / 5</strong></p>
                 <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
                   <select 
                     value={selectedRating} 
@@ -128,7 +128,7 @@ export function MovieDetails() {
               </div>
             ) : (
               <div>
-                <p>Você ainda não avaliou este filme.</p>
+                <p>You haven't rated this movie yet.</p>
                 <div style={{ display: 'flex', gap: '10px' }}>
                   <select 
                     value={selectedRating} 
@@ -137,7 +137,7 @@ export function MovieDetails() {
                   >
                     {[1, 2, 3, 4, 5].map(n => <option key={n} value={n}>{n}</option>)}
                   </select>
-                  <button onClick={handleSaveRating} style={{ cursor: 'pointer', backgroundColor: '#4caf50', color: 'white' }}>Salvar Nota</button>
+                  <button onClick={handleSaveRating} style={{ cursor: 'pointer', backgroundColor: '#4caf50', color: 'white' }}>Save rating</button>
                 </div>
               </div>
             )}
@@ -147,12 +147,12 @@ export function MovieDetails() {
 
       {/* Elenco */}
       <div style={{ marginTop: '40px' }}>
-        <h3>Elenco Principal</h3>
+        <h3>Main cast</h3>
         <ul style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '10px', padding: 0, listStyle: 'none' }}>
           {movie.credits.cast.slice(0, 6).map(actor => (
             <li key={actor.id} style={{ backgroundColor: '#1a1a1a', padding: '10px', borderRadius: '4px' }}>
               <strong>{actor.name}</strong>
-              <span style={{ display: 'block', fontSize: '13px', color: '#aaa' }}>como {actor.character}</span>
+              <span style={{ display: 'block', fontSize: '13px', color: '#aaa' }}>as {actor.character}</span>
             </li>
           ))}
         </ul>

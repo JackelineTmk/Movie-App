@@ -14,7 +14,7 @@ export function RatedMovies() {
         const data = await getRatings();
         setRatedMovies(data);
       } catch (err) {
-        setError('Erro ao carregar seus filmes avaliados.');
+        setError('Error loading your rated movies.');
       } finally {
         setIsLoading(false);
       }
@@ -23,15 +23,15 @@ export function RatedMovies() {
     fetchRatings();
   }, []);
 
-  if (isLoading) return <p>Carregando seus filmes...</p>;
+  if (isLoading) return <p>Loading...</p>;
   if (error) return <p style={{ color: '#ff4a4a' }}>{error}</p>;
 
   return (
     <div>
-      <h2>Meus Filmes Avaliados</h2>
+      <h2>My Rated Movies</h2>
       
       {ratedMovies.length === 0 ? (
-        <p>Você ainda não avaliou nenhum filme.</p>
+        <p>You haven't rated any movies yet.</p>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '20px', marginTop: '20px' }}>
           {ratedMovies.map((movie) => (
@@ -50,7 +50,7 @@ export function RatedMovies() {
                   />
                 ) : (
                   <div style={{ height: '270px', backgroundColor: '#333', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px' }}>
-                    Sem Pôster
+                    No Poster
                   </div>
                 )}
                 
@@ -58,7 +58,7 @@ export function RatedMovies() {
                 
                 {/* Exibição da nota */}
                 <div style={{ backgroundColor: '#4caf50', color: 'white', padding: '5px', borderRadius: '4px', display: 'inline-block', fontWeight: 'bold' }}>
-                  Nota: {movie.rating} / 5
+                  Rating: {movie.rating} / 5
                 </div>
               
               </div>
